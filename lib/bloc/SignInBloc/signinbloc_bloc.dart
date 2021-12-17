@@ -10,27 +10,11 @@ part 'signinbloc_event.dart';
 part 'signinbloc_state.dart';
 
 class SigninblocBloc extends Bloc<SigninblocEvent, SigninblocState> {
-  SigninblocBloc() : super(SigninblocInitial()) {
-    // on<SigninblocEvent>((event, emit) {
-    //   if (event is SignInButtonPressed) {
-    //     emit SigninblocSignedInState();
-    //   }
-    // });
-  }
-  Oauth oauth = Oauth();
-  void listenForUserChange() {
-    ss = oauth.onCurrentUserChange.listen((GoogleSignInAccount? account) {
-      mapEventToState(SignInInitialEvent());
-    });
-  }
-
+  // ignore: cancel_subscriptions
   StreamSubscription<GoogleSignInAccount?>? ss;
   AuthClient? as;
-  @override
-  Stream<SigninblocState> mapEventToState(
-    SigninblocEvent event,
-  ) async* {
-    if (event is SignInInitialEvent) {
+  SigninblocBloc() : super(SigninblocInitial()) {
+    on<SignInInitialEvent>((event, emit) async {
       GoogleSignInAccount? user;
 
       if (oauth.getcurrentUser == null) {
@@ -39,19 +23,59 @@ class SigninblocBloc extends Bloc<SigninblocEvent, SigninblocState> {
         user = oauth.getcurrentUser;
       }
       if (user == null) {
-        yield SigninblocSignedOutState();
+        emit(SigninblocSignedOutState());
       } else {
-        yield SigninblocSignedInState(currentUser: user, client: (await oauth.httpClient)!);
+        emit(SigninblocSignedInState(currentUser: user, client: (await oauth.httpClient)!));
       }
       listenForUserChange();
-    } else if (event is SignInButtonPressed) {
+    });
+
+    on<SignInButtonPressed>((event, emit) async {
       await oauth.handleSignIn();
       listenForUserChange();
-      yield SigninblocSignedInState(currentUser: oauth.getcurrentUser!, client: (await oauth.httpClient)!);
-    } else if (event is SignOutButtonPressed) {
+      emit(SigninblocSignedInState(currentUser: oauth.getcurrentUser!, client: (await oauth.httpClient)!));
+    });
+    on<SignOutButtonPressed>((event, emit) async {
       await oauth.handleSignOut();
       ss!.cancel();
-      yield SigninblocSignedOutState();
-    }
+      emit(SigninblocSignedOutState());
+    });
   }
+  Oauth oauth = Oauth();
+  void listenForUserChange() {
+    ss = oauth.onCurrentUserChange.listen((GoogleSignInAccount? account) {
+      add(SignInInitialEvent());
+    });
+  }
+
+  // StreamSubscription<GoogleSignInAccount?>? ss;
+  // AuthClient? as;
+  // @override
+  // Stream<SigninblocState> mapEventToState(
+  //   SigninblocEvent event,
+  // ) async* {
+  //   if (event is SignInInitialEvent) {
+  //     GoogleSignInAccount? user;
+
+  //     if (oauth.getcurrentUser == null) {
+  //       user = await oauth.googleSignIn.signInSilently();
+  //     } else {
+  //       user = oauth.getcurrentUser;
+  //     }
+  //     if (user == null) {
+  //       yield SigninblocSignedOutState();
+  //     } else {
+  //       yield SigninblocSignedInState(currentUser: user, client: (await oauth.httpClient)!);
+  //     }
+  //     listenForUserChange();
+  //   } else if (event is SignInButtonPressed) {
+  //     await oauth.handleSignIn();
+  //     listenForUserChange();
+  //     yield SigninblocSignedInState(currentUser: oauth.getcurrentUser!, client: (await oauth.httpClient)!);
+  //   } else if (event is SignOutButtonPressed) {
+  //     await oauth.handleSignOut();
+  //     ss!.cancel();
+  //     yield SigninblocSignedOutState();
+  //   }
+  // }
 }

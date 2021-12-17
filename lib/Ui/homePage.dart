@@ -45,8 +45,8 @@ class _HomePageState extends State<HomePage> {
                     appBar: myAppBar(context),
                     body: Builder(builder: (BuildContext context) {
                       if (state.searchStatus == SearchStatus.success) {
+                        bool flag = true;
                         scrollController.addListener(() {
-                          bool flag = true;
                           if (flag &&
                               scrollController.position.maxScrollExtent == scrollController.position.pixels &&
                               !state.hasReachedMax) {
@@ -82,12 +82,13 @@ class _HomePageState extends State<HomePage> {
                                 crossAxisSpacing: 20,
                                 mainAxisSpacing: 20),
                           ),
-                          SliverList(
-                            delegate: SliverChildListDelegate([
-                              // (!state.hasReachedMax) ? LinearProgressIndicator(minHeight: 7) : Container(),
-                              LinearProgressIndicator(minHeight: 7),
-                            ]),
-                          ),
+                          if (!state.hasReachedMax)
+                            SliverList(
+                              delegate: SliverChildListDelegate([
+                                // (!state.hasReachedMax) ? LinearProgressIndicator(minHeight: 7) : Container(),
+                                LinearProgressIndicator(minHeight: 7),
+                              ]),
+                            ),
                         ]);
                       }
 
@@ -112,6 +113,7 @@ class _HomePageState extends State<HomePage> {
 }
 
 AppBar myAppBar(BuildContext context) {
+  TextEditingController textEditingController = TextEditingController();
   return AppBar(
     centerTitle: true,
     titleSpacing: 40,
@@ -121,6 +123,7 @@ AppBar myAppBar(BuildContext context) {
       // padding: EdgeInsets.all(30),
       constraints: BoxConstraints(maxWidth: 800, minWidth: 200, maxHeight: 40),
       child: TextFormField(
+        controller: textEditingController,
         decoration: InputDecoration(
             focusedBorder: OutlineInputBorder(borderRadius: const BorderRadius.all(Radius.circular(7.0))),
             border: OutlineInputBorder(
@@ -128,7 +131,10 @@ AppBar myAppBar(BuildContext context) {
                 borderRadius: const BorderRadius.all(Radius.circular(7.0))),
             suffixIcon: IconButton(
               icon: Icon(Icons.search, color: Colors.black),
-              onPressed: () {},
+              onPressed: () {
+                BlocProvider.of<SearchBloc>(context)
+                  ..add(SearchVideosPressButton(query: textEditingController.text, maxResults: 50));
+              },
             )),
         onFieldSubmitted: (String? value) async {
           BlocProvider.of<SearchBloc>(context)..add(SearchVideosPressButton(query: value, maxResults: 50));

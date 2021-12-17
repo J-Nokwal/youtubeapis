@@ -15,8 +15,10 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Material App',
       debugShowCheckedModeBanner: false,
-      home: BlocProvider(
+      home: BlocProvider<SigninblocBloc>(
+        // create: (context) => SigninblocBloc()..add(SignInInitialEvent()),
         create: (context) => SigninblocBloc()..add(SignInInitialEvent()),
+
         child: HomePage(),
       ),
     );
