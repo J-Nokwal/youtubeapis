@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:googleapis/youtube/v3.dart';
+import 'package:material_floating_search_bar/material_floating_search_bar.dart';
 import 'package:youtubeapis/Ui/appDrawer.dart';
 import 'package:youtubeapis/bloc/SearchBloc/search_bloc.dart';
 import 'package:youtubeapis/bloc/SignInBloc/signinbloc_bloc.dart';
@@ -35,68 +36,68 @@ class _HomePageState extends State<HomePage> {
             // create: (context) =>SearchBloc(client: state.client)..add(SearchVideosPressButton(query: "innomatrix", maxResults: 200)),
             create: (context) => SearchBloc(client: state.client),
 
-            child: Scaffold(
-              // drawer: Drawer(child: AppDrawer()),
-              // appBar: myAppBar(context),
-              body: BlocBuilder<SearchBloc, SearchState>(
-                builder: (context, state) {
-                  return Scaffold(
-                    drawer: Drawer(child: AppDrawer()),
-                    appBar: myAppBar(context),
-                    body: Builder(builder: (BuildContext context) {
-                      if (state.searchStatus == SearchStatus.success) {
-                        bool flag = true;
-                        scrollController.addListener(() {
-                          if (flag &&
-                              scrollController.position.maxScrollExtent == scrollController.position.pixels &&
-                              !state.hasReachedMax) {
-                            flag = false;
-                            BlocProvider.of<SearchBloc>(context)..add(SearchMoreVideosEvent());
-                          }
-                        });
+            child: BlocBuilder<SearchBloc, SearchState>(
+              builder: (context, state) {
+                return Scaffold(
+                  drawer: Drawer(child: AppDrawer()),
+                  body: Stack(
+                    children: [
+                      Builder(builder: (BuildContext context) {
+                        if (state.searchStatus == SearchStatus.success) {
+                          bool flag = true;
+                          scrollController.addListener(() {
+                            if (flag &&
+                                scrollController.position.maxScrollExtent == scrollController.position.pixels &&
+                                !state.hasReachedMax) {
+                              flag = false;
+                              BlocProvider.of<SearchBloc>(context)..add(SearchMoreVideosEvent());
+                            }
+                          });
 
-                        return CustomScrollView(controller: scrollController, slivers: [
-                          SliverGrid(
-                            // itemCount: state.items.length + 1,
-                            delegate: SliverChildBuilderDelegate((BuildContext context, int index) {
-                              // if (state.items.length == index) {
-                              //   if (state.hasReachedMax) {
-                              //     return Container();
-                              //   }
-                              //   return LinearProgressIndicator(
-                              //     minHeight: 7,
-                              //   );
-                              // }
-                              ThumbnailDetails thumbnailDetails = state.items[index].snippet!.thumbnails!;
-                              return Image.network(
-                                thumbnailDetails.maxres?.url ??
-                                    thumbnailDetails.high?.url ??
-                                    thumbnailDetails.medium?.url! ??
-                                    thumbnailDetails.default_!.url!,
-                                fit: BoxFit.contain,
-                              );
-                            }, childCount: state.items.length),
-                            gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
-                                maxCrossAxisExtent: 600,
-                                childAspectRatio: 3 / 2,
-                                crossAxisSpacing: 20,
-                                mainAxisSpacing: 20),
-                          ),
-                          if (!state.hasReachedMax)
-                            SliverList(
-                              delegate: SliverChildListDelegate([
-                                // (!state.hasReachedMax) ? LinearProgressIndicator(minHeight: 7) : Container(),
-                                LinearProgressIndicator(minHeight: 7),
-                              ]),
+                          return CustomScrollView(controller: scrollController, slivers: [
+                            SliverGrid(
+                              // itemCount: state.items.length + 1,
+                              delegate: SliverChildBuilderDelegate((BuildContext context, int index) {
+                                // if (state.items.length == index) {
+                                //   if (state.hasReachedMax) {
+                                //     return Container();
+                                //   }
+                                //   return LinearProgressIndicator(
+                                //     minHeight: 7,
+                                //   );
+                                // }
+                                ThumbnailDetails thumbnailDetails = state.items[index].snippet!.thumbnails!;
+                                return Image.network(
+                                  thumbnailDetails.maxres?.url ??
+                                      thumbnailDetails.high?.url ??
+                                      thumbnailDetails.medium?.url! ??
+                                      thumbnailDetails.default_!.url!,
+                                  fit: BoxFit.contain,
+                                );
+                              }, childCount: state.items.length),
+                              gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
+                                  maxCrossAxisExtent: 600,
+                                  childAspectRatio: 3 / 2,
+                                  crossAxisSpacing: 20,
+                                  mainAxisSpacing: 20),
                             ),
-                        ]);
-                      }
+                            if (!state.hasReachedMax)
+                              SliverList(
+                                delegate: SliverChildListDelegate([
+                                  // (!state.hasReachedMax) ? LinearProgressIndicator(minHeight: 7) : Container(),
+                                  LinearProgressIndicator(minHeight: 7),
+                                ]),
+                              ),
+                          ]);
+                        }
 
-                      return Text("Loading");
-                    }),
-                  );
-                },
-              ),
+                        return Text("Loading");
+                      }),
+                      SearchWid()
+                    ],
+                  ),
+                );
+              },
             ),
           );
         } else {

@@ -4,7 +4,7 @@ part of 'signinbloc_bloc.dart';
 abstract class SigninblocEvent {}
 
 class SignInInitialEvent extends SigninblocEvent {
-  SignInInitialEvent() {}
+  // SignInInitialEvent() {}
 }
 
 class SignInButtonPressed extends SigninblocEvent {}
