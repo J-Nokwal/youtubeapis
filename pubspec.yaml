@@ -18,6 +18,8 @@ dependencies:
   google_sign_in: null
   google_sign_in_web: ^0.10.0+3
   googleapis: ^7.0.0
+  loading_animation_widget: ^0.0.2+2
+  loading_animations: ^2.2.0
   material_floating_search_bar: ^0.3.6
 
 dev_dependencies:
