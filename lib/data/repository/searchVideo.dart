@@ -16,7 +16,7 @@ class YouTubeRepository {
 
   Future<List<SearchResult>> searchVideos(String? query, {int maxResults = 30}) async {
     SearchListResponse searchListResponse =
-        await youTubeApi.search.list(["snippet"], q: query ?? "flutter", maxResults: maxResults, type: ["video"]);
+        await youTubeApi.search.list(["snippet"], q: query, maxResults: maxResults, type: ["video"]);
     pageCount = (searchListResponse.pageInfo!.totalResults! / searchListResponse.pageInfo!.resultsPerPage!).ceil();
 
     this._currentPage = 1;
@@ -32,8 +32,8 @@ class YouTubeRepository {
       if (this._nextPageToken == null) {
         throw MaxSearchResultReachException();
       }
-      SearchListResponse searchListResponse = await youTubeApi.search.list(["snippet"],
-          q: this.query ?? "flutter", maxResults: this.maxResults, type: ["video"], pageToken: _nextPageToken);
+      SearchListResponse searchListResponse = await youTubeApi.search
+          .list(["snippet"], q: this.query, maxResults: this.maxResults, type: ["video"], pageToken: _nextPageToken);
       this._currentPage += 1;
       this._nextPageToken = searchListResponse.nextPageToken;
       return searchListResponse.items!;

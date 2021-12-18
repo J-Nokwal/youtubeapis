@@ -74,18 +74,18 @@ class _SearchWidState extends State<SearchWid> {
   @override
   Widget build(BuildContext context) {
     return buildFloatingSearchBar();
-    return Scaffold(
-      // This is handled by the search bar itself.
-      resizeToAvoidBottomInset: false,
-      body: Stack(
-        fit: StackFit.expand,
-        children: [
-          // buildMap(),
-          // buildBottomNavigationBar(),
-          buildFloatingSearchBar(),
-        ],
-      ),
-    );
+    // return Scaffold(
+    //   // This is handled by the search bar itself.
+    //   resizeToAvoidBottomInset: false,
+    //   body: Stack(
+    //     fit: StackFit.expand,
+    //     children: [
+    //       // buildMap(),
+    //       // buildBottomNavigationBar(),
+    //       buildFloatingSearchBar(),
+    //     ],
+    //   ),
+    // );
   }
 
   Widget buildFloatingSearchBar() {
@@ -101,7 +101,11 @@ class _SearchWidState extends State<SearchWid> {
       openAxisAlignment: 0.0,
       width: isPortrait ? 600 : 500,
       debounceDelay: const Duration(milliseconds: 200),
-
+      body: Container(
+        height: 60,
+        color: Colors.amber,
+        child: Container(),
+      ),
       onQueryChanged: (String query) async {
         if (query == "") {
           setState(() {
